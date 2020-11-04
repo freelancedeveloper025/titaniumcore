@@ -2,11 +2,43 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <primitives/block.h>
 #include "hash.h"
 #include "crypto/common.h"
 #include "crypto/hmac_sha512.h"
 #include "pubkey.h"
+#include "util.h"
+#include <crypto/ethash/include/ethash/progpow.hpp>
+#include <crypto/ethash/include/ethash/ethash.hpp>
+#include <string>
 
+template <typename Hash>
+inline std::string to_hex(const Hash& h)
+{
+    static const auto hex_chars = "0123456789abcdef";
+    std::string str;
+    str.reserve(sizeof(h) * 2);
+    for (auto b : h.bytes)
+    {
+        str.push_back(hex_chars[uint8_t(b) >> 4]);
+        str.push_back(hex_chars[uint8_t(b) & 0xf]);
+    }
+    return str;
+}
+
+inline ethash::hash256 to_hash256(const std::string& hex)
+{
+    auto parse_digit = [](char d) -> int { return d <= '9' ? (d - '0') : (d - 'a' + 10); };
+
+    ethash::hash256 hash = {};
+    for (size_t i = 1; i < hex.size(); i += 2)
+    {
+        int h = parse_digit(hex[i - 1]);
+        int l = parse_digit(hex[i]);
+        hash.bytes[i / 2] = uint8_t((h << 4) | l);
+    }
+    return hash;
+}
 
 inline uint32_t ROTL32(uint32_t x, int8_t r)
 {
@@ -245,4 +277,38 @@ uint64_t SipHashUint256Extra(uint64_t k0, uint64_t k1, const uint256& val, uint3
     SIPROUND;
     SIPROUND;
     return v0 ^ v1 ^ v2 ^ v3;
+}
+
+uint256 KAWPOWHash(const CBlockHeader& blockHeader, uint256& mix_hash)
+{
+    static ethash::epoch_context_ptr context{nullptr, nullptr};
+
+    // Get the context from the block height
+    const auto epoch_number = ethash::get_epoch_number(blockHeader.nHeight);
+
+    if (!context || context->epoch_number != epoch_number)
+        context = ethash::create_epoch_context(epoch_number);
+
+    // Build the header_hash
+    uint256 nHeaderHash = blockHeader.GetKAWPOWHeaderHash();
+    const auto header_hash = to_hash256(nHeaderHash.GetHex());
+
+    // ProgPow hash
+    const auto result = progpow::hash(*context, blockHeader.nHeight, header_hash, blockHeader.nNonce64);
+
+    mix_hash = uint256S(to_hex(result.mix_hash));
+    return uint256S(to_hex(result.final_hash));
+}
+
+
+uint256 KAWPOWHash_OnlyMix(const CBlockHeader& blockHeader)
+{
+    // Build the header_hash
+    uint256 nHeaderHash = blockHeader.GetKAWPOWHeaderHash();
+    const auto header_hash = to_hash256(nHeaderHash.GetHex());
+
+    // ProgPow hash
+    const auto result = progpow::hash_no_verify(blockHeader.nHeight, header_hash, to_hash256(blockHeader.mix_hash.GetHex()), blockHeader.nNonce64);
+
+    return uint256S(to_hex(result));
 }

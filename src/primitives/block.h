@@ -10,6 +10,9 @@
 #include "serialize.h"
 #include "uint256.h"
 
+
+extern uint32_t nKAWPOWActivationTime;
+
 /** Nodes collect new transactions into a block, hash them into a hash tree,
  * and scan through nonce values to make the block's hash satisfy proof-of-work
  * requirements.  When they solve the proof-of-work, they broadcast the block
@@ -27,6 +30,10 @@ public:
     uint32_t nTime;
     uint32_t nBits;
     uint32_t nNonce;
+    
+    uint32_t nHeight;
+    uint64_t nNonce64;
+    uint256 mix_hash;
 
     CBlockHeader()
     {
@@ -42,7 +49,13 @@ public:
         READWRITE(hashMerkleRoot);
         READWRITE(nTime);
         READWRITE(nBits);
-        READWRITE(nNonce);
+        if (nTime < nKAWPOWActivationTime) {
+            READWRITE(nNonce);
+        } else {
+            READWRITE(nHeight);
+            READWRITE(nNonce64);
+            READWRITE(mix_hash);
+        }
     }
 
     void SetNull()
@@ -53,6 +66,10 @@ public:
         nTime = 0;
         nBits = 0;
         nNonce = 0;
+        
+        nNonce64 = 0;
+        nHeight = 0;
+        mix_hash.SetNull();
     }
 
     bool IsNull() const
@@ -61,6 +78,8 @@ public:
     }
 
     uint256 GetHash() const;
+    
+    uint256 GetKAWPOWHeaderHash() const;
 
     int64_t GetBlockTime() const
     {
@@ -150,6 +169,28 @@ struct CBlockLocator
     bool IsNull() const
     {
         return vHave.empty();
+    }
+};
+
+class CKAWPOWInput : private CBlockHeader
+{
+public:
+    CKAWPOWInput(const CBlockHeader &header)
+    {
+        CBlockHeader::SetNull();
+        *((CBlockHeader*)this) = header;
+    }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action) {
+        READWRITE(this->nVersion);
+        READWRITE(hashPrevBlock);
+        READWRITE(hashMerkleRoot);
+        READWRITE(nTime);
+        READWRITE(nBits);
+        READWRITE(nHeight);
     }
 };
 

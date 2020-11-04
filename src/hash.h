@@ -340,10 +340,7 @@ inline uint256 HashX11(const T1 pbegin, const T1 pend)
     sph_sha512_context       ctx_sha512;
     static unsigned char pblank[1];
     
-    CChain chainActive;
-    const int nBlockHeight = chainActive.Height() + 1;
-
-	uint512 hash[16];
+    uint512 hash[10];
     	
     sph_blake512_init(&ctx_blake);
     sph_blake512 (&ctx_blake, (pbegin == pend ? pblank : static_cast<const void*>(&pbegin[0])), (pend - pbegin) * sizeof(pbegin[0]));
@@ -388,34 +385,13 @@ inline uint256 HashX11(const T1 pbegin, const T1 pend)
     sph_echo512_init(&ctx_echo);
     sph_echo512 (&ctx_echo, static_cast<const void*>(&hash[9]), 64);
     sph_echo512_close(&ctx_echo, static_cast<void*>(&hash[10]));
-    
-    //algo update
-	if(nBlockHeight>= 43000){
-	    sph_hamsi512_init(&ctx_hamsi);
-	    sph_hamsi512 (&ctx_hamsi, static_cast<const void*>(&hash[10]), 64);
-	    sph_hamsi512_close(&ctx_hamsi, static_cast<void*>(&hash[11]));
-	    
-	    sph_fugue512_init(&ctx_fugue);
-	    sph_fugue512 (&ctx_fugue, static_cast<const void*>(&hash[11]), 64);
-	    sph_fugue512_close(&ctx_fugue, static_cast<void*>(&hash[12]));
-	    
-	    sph_shabal512_init(&ctx_shabal);
-	    sph_shabal512 (&ctx_shabal, static_cast<const void*>(&hash[12]), 64);
-	    sph_shabal512_close(&ctx_shabal, static_cast<void*>(&hash[13]));
-	    
-	    sph_whirlpool_init(&ctx_whirlpool);
-	    sph_whirlpool(&ctx_whirlpool, static_cast<const void*>(&hash[13]), 64);
-	    sph_whirlpool_close(&ctx_whirlpool, static_cast<void*>(&hash[14]));
-	    
-	    sph_sha512_init(&ctx_sha512);
-	    sph_sha512 (&ctx_sha512, static_cast<const void*>(&hash[14]), 64);
-	    sph_sha512_close(&ctx_sha512, static_cast<void*>(&hash[15]));
-	    
-	    return hash[15].trim256();
-	} else {
-		return hash[10].trim256();
-	}
+    	    
+    return hash[10].trim256();
     
 }
+
+
+uint256 KAWPOWHash(const CBlockHeader& blockHeader, uint256& mix_hash);
+uint256 KAWPOWHash_OnlyMix(const CBlockHeader& blockHeader);
 
 #endif // BITCOIN_HASH_H

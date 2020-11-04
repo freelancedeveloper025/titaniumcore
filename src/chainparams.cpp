@@ -263,6 +263,7 @@ public:
         consensus.nPowDGWHeight = 15;
         consensus.nRuleChangeActivationThreshold = 1499;
         consensus.nMinerConfirmationWindow = 2016;
+        nKAWPOWActivationTime = 1604711076;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999;
