@@ -3,7 +3,7 @@ Titanium staging tree 0.15
 
 `master:` [![Build Status](https://travis-ci.org/ttmpay/ttm.svg?branch=master)](https://travis-ci.org/ttmpay/ttm) `develop:` [![Build Status](https://travis-ci.org/ttmpay/ttm.svg?branch=develop)](https://travis-ci.org/ttmpay/ttm/branches)
 
-https://www.titanium-blocks.org
+https://www.ttm.org
 
 
 What is Ttm?
@@ -16,7 +16,7 @@ are carried out collectively by the network. Titanium is the name of the open
 source software which enables the use of this currency.
 
 For more information, as well as an immediately useable, binary version of
-the Titanium software, see https://www.titanium-blocks.org.
+the Titanium software, see https://www.ttm.org/get-ttm/.
 
 
 License

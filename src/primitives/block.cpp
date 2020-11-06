@@ -11,27 +11,17 @@
 #include "utilstrencodings.h"
 #include "crypto/common.h"
 
-uint32_t nKAWPOWActivationTime;
-
 uint256 CBlockHeader::GetHash() const
 {
-    std::vector<unsigned char> vch(80);
-    CVectorWriter ss(SER_NETWORK, PROTOCOL_VERSION, vch, 0);
-    ss << *this;
-
-    if (nTime < nKAWPOWActivationTime) {
-        return HashX11((const char *)vch.data(), (const char *)vch.data() + vch.size());
-    } else {
-        return KAWPOWHash_OnlyMix(*this);
+    if(nTime <= 1604666663 + 60*60*3 ) {
+    	std::vector<unsigned char> vch(80);
+	    CVectorWriter ss(SER_NETWORK, PROTOCOL_VERSION, vch, 0);
+	    ss << *this;
+    	return HashX11((const char *)vch.data(), (const char *)vch.data() + vch.size());
     }
-    
-}
-
-uint256 CBlockHeader::GetKAWPOWHeaderHash() const
-{
-    CKAWPOWInput input{*this};
-
-    return SerializeHash(input);
+    else {
+    	return KAWPOWHash(*this);
+    }
 }
 
 std::string CBlock::ToString() const
