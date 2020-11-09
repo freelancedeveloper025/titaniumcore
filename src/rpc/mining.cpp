@@ -147,13 +147,17 @@ UniValue generateBlocks(std::shared_ptr<CReserveScript> coinbaseScript, int nGen
         }
         uint256 mix_hash;
         while (nMaxTries > 0 && pblock->nNonce < nInnerLoopCount && !CheckProofOfWork(pblock->GetHash(), pblock->nBits, Params().GetConsensus())) {
-            ++pblock->nNonce;
+            if (pblock->nTime < 1604691440 + 10*60) {
+                ++pblock->nNonce;
+            } else  {
+                ++pblock->nNonce64;
+            }
             --nMaxTries;
         }
         if (nMaxTries == 0) {
             break;
         }
-        if (pblock->nNonce == nInnerLoopCount) {
+        if (pblock->nNonce == nInnerLoopCount || pblock->nNonce64 == nInnerLoopCount ) {
             continue;
         }
         pblock->mix_hash = mix_hash;
@@ -883,7 +887,7 @@ static UniValue pprpcsb(const JSONRPCRequest& request) {
     std::shared_ptr<CBlock> blockptr = std::make_shared<CBlock>();
     *blockptr = mapRVNKAWBlockTemplates.at(header_hash);
 
-    blockptr->nNonce = nonce;
+    blockptr->nNonce64 = nonce;
     blockptr->mix_hash = uint256S(mix_hash);
 
     if (blockptr->vtx.empty() || !blockptr->vtx[0]->IsCoinBase()) {
