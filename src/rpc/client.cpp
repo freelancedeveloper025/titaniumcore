@@ -183,6 +183,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "echojson", 8, "arg8" },
     { "echojson", 9, "arg9" },
     { "stop", 0, "wait" },
+    { "getkawpowhash", 3, "height"},
 };
 
 class CRPCConvertTable

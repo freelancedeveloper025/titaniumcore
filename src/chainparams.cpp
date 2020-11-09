@@ -255,6 +255,7 @@ public:
         consensus.DIP0003EnforcementHeight = 800;
         consensus.DIP0003EnforcementHash = uint256S("000000412b5bd8e758d857c4812d409984f806e14e13287f3547b1714d5ac71f");
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+        //consensus.kawpowLimit = uint256S("0000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffff"); 
         consensus.nPowTargetTimespan = 24 * 60 * 60; 
         consensus.nPowTargetSpacing = 2.5 * 60; 
         consensus.fPowAllowMinDifficultyBlocks = false;

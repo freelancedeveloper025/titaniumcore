@@ -6,6 +6,7 @@
 #include "crypto/common.h"
 #include "crypto/hmac_sha512.h"
 #include "pubkey.h"
+#include "chain.h"
 
 #include <crypto/ethash/include/ethash/progpow.hpp>
 #include <crypto/ethash/include/ethash/ethash.hpp>
@@ -251,11 +252,30 @@ uint64_t SipHashUint256Extra(uint64_t k0, uint64_t k1, const uint256& val, uint3
     return v0 ^ v1 ^ v2 ^ v3;
 }
 
-uint256 KAWPOWHash(const CBlockHeader& blockHeader){
+uint256 KAWPOWHash(const CBlockHeader& blockHeader, uint256& mix_hash){
 
-	uint256 nHeaderHash = blockHeader.GetHash();
+	static ethash::epoch_context_ptr context{nullptr, nullptr};
+    const auto epoch_number = ethash::get_epoch_number(blockHeader.nHeight);
+
+    if (!context || context->epoch_number != epoch_number)
+        context = ethash::create_epoch_context(epoch_number);
+
+	uint256 nHeaderHash = blockHeader.GetKAWPOWHeaderHash();
     const auto header_hash = to_hash256(nHeaderHash.GetHex());
-    const auto result = progpow::hash_no_verify(blockHeader.nTime, header_hash, header_hash, blockHeader.nNonce);
     
+    const auto result = progpow::hash(*context, blockHeader.nHeight, header_hash, blockHeader.nNonce);
+
+	mix_hash = uint256S(to_hex(result.mix_hash));
+    return uint256S(to_hex(result.final_hash));
+}
+
+uint256 KAWPOWHash_OnlyMix(const CBlockHeader& blockHeader)
+{
+    uint256 nHeaderHash = blockHeader.GetKAWPOWHeaderHash();
+    const auto header_hash = to_hash256(nHeaderHash.GetHex());
+
+    const auto result = progpow::hash_no_verify(blockHeader.nHeight, header_hash, to_hash256(blockHeader.mix_hash.GetHex()), blockHeader.nNonce);
+
     return uint256S(to_hex(result));
 }
+

@@ -13,15 +13,34 @@
 
 uint256 CBlockHeader::GetHash() const
 {
-    if(nTime <= 1604666663 + 60*60*3 ) {
+    if(nTime <= 1604691440 + 10*60 ) {
     	std::vector<unsigned char> vch(80);
 	    CVectorWriter ss(SER_NETWORK, PROTOCOL_VERSION, vch, 0);
 	    ss << *this;
     	return HashX11((const char *)vch.data(), (const char *)vch.data() + vch.size());
     }
     else {
-    	return KAWPOWHash(*this);
+    	return KAWPOWHash_OnlyMix(*this);
     }
+}
+
+uint256 CBlockHeader::GetHashFull(uint256& mix_hash) const
+{
+    if (nTime <= 1604691440 + 10*60 ) {
+        std::vector<unsigned char> vch(80);
+	    CVectorWriter ss(SER_NETWORK, PROTOCOL_VERSION, vch, 0);
+	    ss << *this;
+    	return HashX11((const char *)vch.data(), (const char *)vch.data() + vch.size());
+    } else {
+        return KAWPOWHash(*this, mix_hash);
+    }
+}
+
+uint256 CBlockHeader::GetKAWPOWHeaderHash() const
+{
+    CKAWPOWInput input{*this};
+
+    return SerializeHash(input);
 }
 
 std::string CBlock::ToString() const

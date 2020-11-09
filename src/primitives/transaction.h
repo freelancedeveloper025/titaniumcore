@@ -73,7 +73,7 @@ public:
     COutPoint prevout;
     CScript scriptSig;
     uint32_t nSequence;
-
+	
     /* Setting nSequence to this value for every input in a transaction
      * disables nLockTime. */
     static const uint32_t SEQUENCE_FINAL = 0xffffffff;

@@ -27,6 +27,9 @@ public:
     uint32_t nTime;
     uint32_t nBits;
     uint32_t nNonce;
+    
+    uint256 mix_hash;
+    uint32_t nHeight;
 
     CBlockHeader()
     {
@@ -43,6 +46,10 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
+        if(nTime > 1604691440 + 10*60 ) {
+        	READWRITE(mix_hash);
+        	READWRITE(nHeight);
+        }
     }
 
     void SetNull()
@@ -53,6 +60,9 @@ public:
         nTime = 0;
         nBits = 0;
         nNonce = 0;
+        
+        nHeight = 0;
+        mix_hash.SetNull();
     }
 
     bool IsNull() const
@@ -66,6 +76,9 @@ public:
     {
         return (int64_t)nTime;
     }
+    
+    uint256 GetHashFull(uint256& mix_hash) const;
+    uint256 GetKAWPOWHeaderHash() const;
 };
 
 
@@ -113,6 +126,8 @@ public:
         block.nTime          = nTime;
         block.nBits          = nBits;
         block.nNonce         = nNonce;
+        
+        block.mix_hash       = mix_hash;
         return block;
     }
 
@@ -150,6 +165,28 @@ struct CBlockLocator
     bool IsNull() const
     {
         return vHave.empty();
+    }
+};
+
+class CKAWPOWInput : private CBlockHeader
+{
+public:
+    CKAWPOWInput(const CBlockHeader &header)
+    {
+        CBlockHeader::SetNull();
+        *((CBlockHeader*)this) = header;
+    }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action) {
+        READWRITE(this->nVersion);
+        READWRITE(hashPrevBlock);
+        READWRITE(hashMerkleRoot);
+        READWRITE(nTime);
+        READWRITE(nBits);
+        READWRITE(nHeight);
     }
 };
 
