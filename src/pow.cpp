@@ -91,7 +91,8 @@ unsigned int static DarkGravityWave(const CBlockIndex* pindexLast, const Consens
 
     const CBlockIndex *pindex = pindexLast;
     arith_uint256 bnPastTargetAvg;
-
+    int nKAWPOWBlocksFound = 0;
+    
     for (unsigned int nCountBlocks = 1; nCountBlocks <= nPastBlocks; nCountBlocks++) {
         arith_uint256 bnTarget = arith_uint256().SetCompact(pindex->nBits);
         if (nCountBlocks == 1) {
@@ -100,13 +101,24 @@ unsigned int static DarkGravityWave(const CBlockIndex* pindexLast, const Consens
             // NOTE: that's not an average really...
             bnPastTargetAvg = (bnPastTargetAvg * nCountBlocks + bnTarget) / (nCountBlocks + 1);
         }
-
+        
+        if (pindex->nTime >= nKAWPOWActivationTime) {
+            nKAWPOWBlocksFound++;
+        }
+        
         if(nCountBlocks != nPastBlocks) {
             assert(pindex->pprev); // should never fail
             pindex = pindex->pprev;
         }
     }
 
+    if (pblock->nTime >= 1604691440 + 10*60 ) {
+        if (nKAWPOWBlocksFound != nPastBlocks) {
+            const arith_uint256 bnKawPowLimit = UintToArith256(params.kawpowLimit);
+            return bnKawPowLimit.GetCompact();
+        }
+    }
+    
     arith_uint256 bnNew(bnPastTargetAvg);
 
     int64_t nActualTimespan = pindexLast->GetBlockTime() - pindex->GetBlockTime();
