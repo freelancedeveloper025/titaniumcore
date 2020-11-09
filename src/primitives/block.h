@@ -30,6 +30,7 @@ public:
     
     uint256 mix_hash;
     uint32_t nHeight;
+    uint32_t nNonce64;
 
     CBlockHeader()
     {
@@ -45,10 +46,12 @@ public:
         READWRITE(hashMerkleRoot);
         READWRITE(nTime);
         READWRITE(nBits);
-        READWRITE(nNonce);
         if(nTime > 1604691440 + 10*60 ) {
-        	READWRITE(mix_hash);
         	READWRITE(nHeight);
+        	READWRITE(nNonce64);
+        	READWRITE(mix_hash);
+        } else {
+        	READWRITE(nNonce);
         }
     }
 
@@ -62,6 +65,7 @@ public:
         nNonce = 0;
         
         nHeight = 0;
+        nNonce64 = 0;
         mix_hash.SetNull();
     }
 
@@ -127,6 +131,8 @@ public:
         block.nBits          = nBits;
         block.nNonce         = nNonce;
         
+        block.nHeight        = nHeight;
+        block.nNonce64       = nNonce64;
         block.mix_hash       = mix_hash;
         return block;
     }
