@@ -255,7 +255,7 @@ public:
         consensus.DIP0003EnforcementHeight = 800;
         consensus.DIP0003EnforcementHash = uint256S("000000412b5bd8e758d857c4812d409984f806e14e13287f3547b1714d5ac71f");
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-        //consensus.kawpowLimit = uint256S("0000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffff"); 
+        consensus.kawpowLimit = uint256S("0000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffff"); 
         consensus.nPowTargetTimespan = 24 * 60 * 60; 
         consensus.nPowTargetSpacing = 2.5 * 60; 
         consensus.fPowAllowMinDifficultyBlocks = false;
@@ -410,6 +410,7 @@ public:
         consensus.DIP0003EnforcementHeight = 7300;
         consensus.DIP0003EnforcementHash = uint256S("00000055ebc0e974ba3a3fb785c5ad4365a39637d4df168169ee80d313612f8f");
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
+        consensus.kawpowLimit = uint256S("0000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffff"); 
         consensus.nPowTargetTimespan = 24 * 60 * 60; // Ttm: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Ttm: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = true;
@@ -566,6 +567,7 @@ public:
         consensus.DIP0003EnforcementHeight = 2; // DIP0003 activated immediately on devnet
         consensus.DIP0003EnforcementHash = uint256();
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
+        consensus.kawpowLimit = uint256S("0000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffff"); 
         consensus.nPowTargetTimespan = 24 * 60 * 60; // Ttm: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Ttm: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = true;
@@ -718,6 +720,7 @@ public:
         consensus.DIP0003EnforcementHeight = 500;
         consensus.DIP0003EnforcementHash = uint256();
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
+        consensus.kawpowLimit = uint256S("0000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffff"); 
         consensus.nPowTargetTimespan = 24 * 60 * 60; // Ttm: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Ttm: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = true;
