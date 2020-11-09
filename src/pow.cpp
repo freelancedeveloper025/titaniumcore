@@ -102,7 +102,7 @@ unsigned int static DarkGravityWave(const CBlockIndex* pindexLast, const Consens
             bnPastTargetAvg = (bnPastTargetAvg * nCountBlocks + bnTarget) / (nCountBlocks + 1);
         }
         
-        if (pindex->nTime >= nKAWPOWActivationTime) {
+        if (pindex->nTime >= 1604691440 + 10*60) {
             nKAWPOWBlocksFound++;
         }
         
