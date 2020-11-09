@@ -79,7 +79,7 @@ unsigned int static KimotoGravityWell(const CBlockIndex* pindexLast, const Conse
     return bnNew.GetCompact();
 }
 
-unsigned int static DarkGravityWave(const CBlockIndex* pindexLast, const Consensus::Params& params,const CBlockHeader *pblock,) {
+unsigned int static DarkGravityWave(const CBlockIndex* pindexLast, const Consensus::Params& params, const CBlockHeader *pblock) {
     /* current difficulty formula, ttm - DarkGravity v3, written by Evan Duffield - evan@ttm.org */
     const arith_uint256 bnPowLimit = UintToArith256(params.powLimit);
     int64_t nPastBlocks = 24;
