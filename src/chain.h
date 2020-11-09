@@ -214,6 +214,7 @@ public:
     unsigned int nNonce;
     
     uint256 mix_hash;
+    uint64_t nNonce64;
 
     //! (memory only) Sequential id assigned to distinguish order in which blocks are received.
     int32_t nSequenceId;
@@ -243,6 +244,7 @@ public:
         nBits          = 0;
         nNonce         = 0;
         
+        nNonce64       = 0;
         mix_hash       = uint256();
     }
 
@@ -260,6 +262,8 @@ public:
         nTime          = block.nTime;
         nBits          = block.nBits;
         nNonce         = block.nNonce;
+        nHeight        = block.nHeight;
+        nNonce64       = block.nNonce64;
         mix_hash       = block.mix_hash;
     }
 
@@ -291,6 +295,8 @@ public:
         block.nTime          = nTime;
         block.nBits          = nBits;
         block.nNonce         = nNonce;
+        block.nHeight        = nHeight;
+        block.nNonce64       = nNonce64;
         block.mix_hash       = mix_hash;
         return block;
     }
@@ -415,10 +421,12 @@ public:
         READWRITE(hashMerkleRoot);
         READWRITE(nTime);
         READWRITE(nBits);
-        READWRITE(nNonce);
-        
+
         if (nTime < 1604691440 + 10*60 ) {
+            READWRITE(nNonce64);
             READWRITE(mix_hash);
+        } else {
+        	READWRITE(nNonce);
         }
     }
 
@@ -433,6 +441,8 @@ public:
         block.nTime           = nTime;
         block.nBits           = nBits;
         block.nNonce          = nNonce;
+        block.nHeight         = nHeight;
+        block.nNonce64        = nNonce64;
         block.mix_hash        = mix_hash;
         return block.GetHash();
     }
